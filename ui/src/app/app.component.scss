@@ -1,0 +1,16 @@
+.search-bar {
+    position: relative;
+    display: flex;
+    margin: 1rem auto;
+
+    .search-icon {
+        position: absolute;
+        top: 1rem;
+    }
+
+    input {
+        width: 30rem;
+        font-size: 1rem;
+        padding-left: 2rem;
+    }
+}
