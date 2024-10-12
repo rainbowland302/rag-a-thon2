@@ -21,8 +21,12 @@ if __name__ == '__main__':
     documents = SimpleDirectoryReader("data").load_data()
     index = VectorStoreIndex.from_documents(documents)
     query_engine = index.as_query_engine()
-    response = query_engine.query("Who is the author?")
+    # response = query_engine.query("Who is the author?")
+    response = query_engine.query(
+        'I like playing strategy games. Can you recommend some strategy games published on Steam in 2024?')
+
     print(response)
+
 
 
 
