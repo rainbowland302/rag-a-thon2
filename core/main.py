@@ -1,8 +1,12 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 import os
+import json
 
-# os.environ["OPENAI_API_KEY"] = "sk-...Qk0A"
+# Load the secrets from config.json
+with open('secrets.json', 'r') as file:
+    secrets = json.load(file)
 
+os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
 
 def print_hi(name):
     # 在下面的代码行中使用断点来调试脚本。
