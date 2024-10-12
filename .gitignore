@@ -3,3 +3,4 @@ ddenv
 core/__pycache__
 server/__pycache__
 .python-version
+server/core/__pycache__

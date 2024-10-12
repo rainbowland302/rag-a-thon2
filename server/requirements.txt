@@ -3,4 +3,3 @@ packaging==24.0
 wheel
 flask
 llama-index
-tbb
