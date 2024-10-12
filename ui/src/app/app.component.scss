@@ -36,17 +36,26 @@
     max-width: 600px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
-    h3 {
-        margin-top: 0;
-        margin-bottom: 1rem;
-        color: #333;
-        font-size: 1.2rem;
+    .question, .answer {
+        margin-bottom: 1.5rem;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
     }
 
-    p {
-        color: #555;
-        line-height: 1.6;
-        margin-bottom: 0;
+    .question {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 1rem;
     }
 }
 

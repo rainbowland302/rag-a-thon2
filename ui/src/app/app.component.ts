@@ -6,6 +6,11 @@ import { CommonModule } from '@angular/common';
 
 import { AppService } from "./app.service";
 
+interface QueryResponse {
+  question: string;
+  answer: string;
+}
+
 @Component({
     selector: 'app-root',
     standalone: true,
@@ -20,15 +25,21 @@ export class AppComponent {
     ) {}
 
     message = "";
-    response: string | null = null;
+    response: QueryResponse | null = null;
     isLoading = false;
 
     search() {
+        if (!this.message.trim()) return;
+        
         this.isLoading = true;
         this.response = null;
+        const question = this.message;
         this.service.retrieveAns(this.message).subscribe({
             next: (res: any) => {
-                this.response = res.res;
+                this.response = {
+                    question: question,
+                    answer: res.res
+                };
                 this.isLoading = false;
             },
             error: (err) => {

@@ -9,9 +9,9 @@
     </header>
     <div class="content-container">
         <div class="search-bar">
-            <cds-icon class="search-icon" shape="search"size="24"></cds-icon>
-            <input clrInput placeholder="Search ..." [(ngModel)]="message" />
-            <button class="btn btn-link search-btn" (click)="search()">
+            <cds-icon class="search-icon" shape="search" size="24"></cds-icon>
+            <input clrInput placeholder="Ask me anything ..." [(ngModel)]="message" (keyup.enter)="search()" />
+            <button class="btn btn-link search-btn" (click)="search()" [disabled]="isLoading || !message.trim()">
                 <cds-icon class="arrow-icon" shape="circle-arrow" size="24"></cds-icon>
             </button>
         </div>
@@ -24,8 +24,14 @@
             </span>
         </div>
         <div *ngIf="response" class="response-container">
-            <h3>Response:</h3>
-            <p>{{ response }}</p>
+            <div class="question">
+                <h3>Question:</h3>
+                <p>{{ response.question }}</p>
+            </div>
+            <div class="answer">
+                <h3>Answer:</h3>
+                <p>{{ response.answer }}</p>
+            </div>
         </div>
     </div>
 </div>
