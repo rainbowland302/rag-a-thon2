@@ -23,8 +23,8 @@ export class AppComponent {
     message = ""
 
     search() {
-        this.service.retrieveAns(this.message).subscribe(res => {
-
+        this.service.retrieveAns(this.message).subscribe((res: any) => {
+            console.log(res.res);
         });
         this.message = "";
     }

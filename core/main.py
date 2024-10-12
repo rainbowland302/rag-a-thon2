@@ -1,33 +1,29 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 import os
 import json
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Load the secrets from config.json
-with open('secrets.json', 'r') as file:
+with open('./core/secrets.json', 'r') as file:
     secrets = json.load(file)
 
 os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
 
-def print_hi(name):
-    # 在下面的代码行中使用断点来调试脚本。
-    print(f'Hi, {name}')  # 按 ⌘F8 切换断点。
+# Load documents and create index (do this once at startup)
+documents = SimpleDirectoryReader("./core/data").load_data()
+index = VectorStoreIndex.from_documents(documents)
+query_engine = index.as_query_engine()
 
 
-# 按间距中的绿色按钮以运行脚本。
+def get_response(query):
+    response = query_engine.query(query)
+    # Convert response to string for easy JSON serialization
+    return str(response)
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-
-    documents = SimpleDirectoryReader("data").load_data()
-    index = VectorStoreIndex.from_documents(documents)
-    query_engine = index.as_query_engine()
-    # response = query_engine.query("Who is the author?")
-    response = query_engine.query(
-        'I like playing strategy games. Can you recommend some strategy games published on Steam in 2024?')
-
-    print(response)
-
-
-
-
-# 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
+    # Example usage
+    print(get_response(
+        'I like playing strategy games. Can you recommend some strategy games published on Steam in 2024?'))
