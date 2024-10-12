@@ -49,13 +49,18 @@
         p {
             color: #555;
             line-height: 1.6;
-            margin-bottom: 0;
+            margin-bottom: 0.5rem;
         }
     }
 
     .question {
         border-bottom: 1px solid #e0e0e0;
         padding-bottom: 1rem;
+
+        .timestamp {
+            color: #888;
+            font-size: 0.8rem;
+        }
     }
 }
 

@@ -9,6 +9,7 @@ import { AppService } from "./app.service";
 interface QueryResponse {
   question: string;
   answer: string;
+  timestamp: Date;
 }
 
 @Component({
@@ -25,21 +26,21 @@ export class AppComponent {
     ) {}
 
     message = "";
-    response: QueryResponse | null = null;
+    responses: QueryResponse[] = [];
     isLoading = false;
 
     search() {
         if (!this.message.trim()) return;
         
         this.isLoading = true;
-        this.response = null;
         const question = this.message;
         this.service.retrieveAns(this.message).subscribe({
             next: (res: any) => {
-                this.response = {
+                this.responses.unshift({
                     question: question,
-                    answer: res.res
-                };
+                    answer: res.res,
+                    timestamp: new Date()
+                });
                 this.isLoading = false;
             },
             error: (err) => {
