@@ -7,3 +7,4 @@ server/core/__pycache__
 server/core/secrets.json
 server/.env
 venv
+server/static
