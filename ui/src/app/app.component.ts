@@ -29,13 +29,16 @@ export class AppComponent {
     message = "";
     responses: QueryResponse[] = [];
     isLoading = false;
-    latestBackgroundImage: string | null = null;
+    currentBackgroundImage: string | null = null;
+    nextBackgroundImage: string | null = null;
+    isTransitioning = false;
 
     search() {
         if (!this.message.trim()) return;
         
         this.isLoading = true;
         const question = this.message;
+        this.isTransitioning = true;
         this.service.retrieveAns(this.message).subscribe({
             next: (res: any) => {
                 this.responses.unshift({
@@ -44,7 +47,7 @@ export class AppComponent {
                     timestamp: new Date(),
                     imageUrl: res.img
                 });
-                this.latestBackgroundImage = res.img;
+                this.preloadAndUpdateBackgroundImage(res.img);
                 this.isLoading = false;
             },
             error: (err) => {
@@ -53,5 +56,26 @@ export class AppComponent {
             }
         });
         this.message = "";
+    }
+
+    preloadAndUpdateBackgroundImage(newImageUrl: string) {
+        if (this.nextBackgroundImage !== newImageUrl) {
+            const img = new Image();
+            console.log("preloading");
+            img.onload = () => {
+                console.log("loaded");
+                this.isTransitioning = true;
+                this.nextBackgroundImage = newImageUrl;
+                setTimeout(() => {
+                    console.log("transitioning done");
+                    this.isTransitioning = false;
+                    setTimeout(() => {
+                        console.log("change current to next");
+                        this.currentBackgroundImage = this.nextBackgroundImage;
+                    }, 2000); // Match this with the faster fade-in duration
+                }, 500); // Match this with the slower fade-out duration
+            };
+            img.src = newImageUrl;
+        }
     }
 }

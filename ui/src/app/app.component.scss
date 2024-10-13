@@ -47,15 +47,38 @@
     background-repeat: no-repeat;
     transition: background-image 0.5s ease-in-out;
 
-    &::before {
-        content: '';
-        position: fixed;
-        top: 60px; // Adjust based on your header height
+    .background-overlay2 {
+        content: "";
+        position: absolute;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        background-size: cover;
+        background-position: center;
         background-color: rgba(255, 255, 255, 0.3);
-        z-index: 1;
+    }
+
+    .background-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out; // Slower fade out (1 to 0)
+        // z-index: -2;
+        h1 {
+            background-color: green;
+        }
+    }
+
+    &.transitioning .background-overlay {
+        opacity: 1;
+        transition: opacity 0s ease-in-out; // Faster fade in (0 to 1)
     }
 }
 
