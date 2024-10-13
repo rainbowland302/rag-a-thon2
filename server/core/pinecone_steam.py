@@ -8,16 +8,16 @@ from tqdm.auto import tqdm
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
-from phoenix.otel import register
-
-
-tracer_provider = register(
-    project_name="immerse-into-real-steam-games",  # Default is 'default'
-    endpoint="http://localhost:6006/v1/traces",
-)
-
-LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
+# from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+# from phoenix.otel import register
+#
+#
+# tracer_provider = register(
+#     project_name="immerse-into-real-steam-games",  # Default is 'default'
+#     endpoint="http://localhost:6006/v1/traces",
+# )
+#
+# LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
 
 # Get the directory of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +30,8 @@ load_dotenv(os.path.join(server_dir, '.env'))
 openai_api_key = os.getenv("OPENAI_API_KEY")
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
 together_api_key = os.getenv("TOGETHER_API_KEY")
+replicate_api_token = os.getenv("REPLICATE_API_TOKEN")
+
 
 client = OpenAI(
     api_key=openai_api_key,
@@ -248,6 +250,67 @@ class ImageGenerator(Workflow):
         print(response.data[0].url)
         return StopEvent(result=str(response.data[0].url))
 
+
+
+import replicate
+import asyncio
+
+from llama_index.core.workflow import (
+    StartEvent,
+    StopEvent,
+    Workflow,
+    step,
+    Event,
+)
+
+from dotenv import load_dotenv
+load_dotenv()
+
+class FirstMusicEvent(Event):
+    first_output: str
+
+class MusicGenerator(Workflow):
+    @step()
+    async def generate(self, ev: StartEvent) -> FirstMusicEvent:
+        query = ev.first_input
+
+        from openai import OpenAI
+        client = OpenAI()
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {
+                    "role": "user",
+                    "content": query
+                }
+            ]
+        )
+        result_music_prompt = completion.choices[0].message
+
+        return FirstMusicEvent(first_output=str(result_music_prompt))
+
+    @step()
+    async def generate_music(self, ev: FirstMusicEvent) -> StopEvent:
+        query = ev.first_output
+        print(os.environ.get(''))
+        print(query)
+        input = {
+            "prompt": query,
+            "model_version": "stereo-large",
+            "output_format": "mp3",
+            "normalization_strategy": "peak"
+        }
+
+        output = replicate.run(
+            "meta/musicgen:671ac645ce5e552cc63a54a2bbff63fcf798043055d2dac5fc9e36a837eedcfb",
+            input=input
+        )
+        # print(output)
+        return StopEvent(result=str(output))
+
+
+
 def get_response(query):
     # query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
     query_with_contexts = retrieve(query)
@@ -256,8 +319,26 @@ def get_response(query):
     response = complete(query_with_contexts)
     # return str(response)
 
+
+    #run music generation firt
+    # user_in = "I want to play a popular casual game, do you have any recommendations"
+    prompt = "Help me change this sentence into a prompt suitable for generating music. "
+    query_with_prompt = query + prompt
+    print(query_with_prompt)
+
+    async def musicgen():
+        w = MusicGenerator(timeout=10000, verbose=False)
+        print('bugs here?: ' + query_with_prompt)
+        url = await w.run(
+            first_input=query_with_prompt)
+        return url
+
+    music_url = asyncio.run(musicgen())
+    # draw_all_possible_flows(ImageGenerator, filename="image_generator_step_workflow.html")
+
+
     async def imagegen():
-        w = ImageGenerator(timeout=10, verbose=False)
+        w = ImageGenerator(timeout=10000, verbose=False)
         url = await w.run(
             first_input="help me write a prompt for image generation, I want a photo of the recommended games" + str(response))
         return url
@@ -266,7 +347,8 @@ def get_response(query):
     # draw_all_possible_flows(ImageGenerator, filename="image_generator_step_workflow.html")
     res = {
         "res": str(response),
-        "img": str(url_flux)
+        "img": str(url_flux),
+        "aud": str(music_url)
     }
     return res
 

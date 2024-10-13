@@ -28,7 +28,8 @@ def search():
     return jsonify({
         "msg": message,
         "res": response.get('res'),
-        "img": response.get('img')
+        "img": response.get('img'),
+        "aud": response.get('aud'),
     })
 
 if __name__ == '__main__':
