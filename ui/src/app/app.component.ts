@@ -28,6 +28,7 @@ export class AppComponent {
     message = "";
     responses: QueryResponse[] = [];
     isLoading = false;
+    image: string = "";
 
     search() {
         if (!this.message.trim()) return;
@@ -42,6 +43,9 @@ export class AppComponent {
                     timestamp: new Date()
                 });
                 this.isLoading = false;
+                if (res.img) {
+                    this.image = res.img;
+                }
             },
             error: (err) => {
                 console.error('Error:', err);

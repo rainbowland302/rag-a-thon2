@@ -23,16 +23,23 @@
                 Loading...
             </span>
         </div>
-        <div *ngFor="let response of responses" class="response-container">
-            <div class="question">
-                <h3>Question:</h3>
-                <p>{{ response.question }}</p>
-                <small class="timestamp">{{ response.timestamp | date:'medium' }}</small>
+        <div class="response-wrapper">
+            <div>
+                <div *ngFor="let response of responses" class="response-container">
+                    <div class="question">
+                        <h3>Question:</h3>
+                        <p>{{ response.question }}</p>
+                        <small class="timestamp">{{ response.timestamp | date:'medium' }}</small>
+                    </div>
+                    <div class="answer">
+                        <h3>Answer:</h3>
+                        <p>{{ response.answer }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="answer">
-                <h3>Answer:</h3>
-                <p>{{ response.answer }}</p>
-            </div>
+            @if(image) {
+                <img [src]="image">
+            }
         </div>
     </div>
 </div>

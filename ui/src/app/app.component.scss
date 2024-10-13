@@ -27,6 +27,14 @@
     align-items: center;
 }
 
+.response-wrapper {
+    display: flex;
+}
+
+img {
+    max-height: 1024px;
+}
+
 .response-container {
     margin-top: 2rem;
     padding: 1.5rem;
