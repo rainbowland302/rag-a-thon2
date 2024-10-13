@@ -6,6 +6,9 @@ from pinecone import Pinecone
 from pinecone import ServerlessSpec
 import time
 from tqdm.auto import tqdm
+import os
+from openai import OpenAI
+
 
 # Load the secrets from config.json
 with open('secrets.json', 'r') as file:
@@ -13,6 +16,11 @@ with open('secrets.json', 'r') as file:
 
 os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
 os.environ["PINECONE_API_KEY"] = secrets["PINECONE_API_KEY"]
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
+
 
 
 dataset = load_dataset("FronkonGames/steam-games-dataset", split="train")
@@ -33,7 +41,7 @@ dims = len(embed_model.get_text_embedding("some random text blablabla"))
 # dims = 1536
 # print(dims)
 
-index_name = "gpt-4o-research-agent"
+index_name = "ragathon-gpt-4o-research-agent-small"
 
 # check if index already exists (it shouldn't if this is first time)
 if index_name not in pc.list_indexes().names():
@@ -56,7 +64,7 @@ index.describe_index_stats()
 
 # easier to work with dataset as pandas dataframe
 # take first 10k instances as example. Embed more at your convenience
-data = dataset.to_pandas().iloc[:10000]
+data = dataset.to_pandas().iloc[:1000]
 data['AppID'] = data['AppID'].astype(str)
 data = data.dropna(subset=['AppID','Release date','Supported languages','Name', 'About the game','Price','User score','Tags'])
 
@@ -103,18 +111,16 @@ batch_size = 128
 # Screenshots,
 # Movies
 # '''
+'''
 for i in tqdm(range(0, len(data), batch_size)):
     i_end = min(len(data), i+batch_size)
     batch = data[i:i_end].to_dict(orient="records")
     # get batch of data
-
     metadata = [{
         "Name": r["Name"],
         "Price": r["Price"],
         "Release date": r["Release date"],
-        "User score": r["User score"],
-        "Tags": r["Tags"],
-        "Supported languages": r["Supported languages"]
+        "About the game":r["About the game"]
     } for r in batch]
     # generate unique ids for each chunk
     ids = [r["AppID"] for r in batch]
@@ -125,3 +131,68 @@ for i in tqdm(range(0, len(data), batch_size)):
     # add to Pinecone
     vec = zip(ids, embeds, metadata)
     index.upsert(vectors=vec)
+'''
+
+query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
+
+# create the query vector
+limit = 100000
+def retrieve(query):
+    xq = embed_model.get_text_embedding(query)
+    # now query
+    res = index.query(vector=xq, top_k=4, include_metadata=True)
+    print(res)
+    # get relevant contexts
+    contexts = []
+    contexts = contexts + [
+        x['metadata']['Name'] + '. About the ' + x['metadata']['Name']  + ' : '+ x['metadata']['About the game'] for x in res['matches']
+    ]
+    # build our prompt with the retrieved contexts included
+    prompt_start = (
+        "Answer the question based on the context below.\n\n"+
+        "Context:\n"
+    )
+    prompt_end = (
+        f"\n\nQuestion: {query}\nAnswer:"
+    )
+    # append contexts until hitting limit
+    for i in range(1, len(contexts)):
+        if len("\n\n---\n\n".join(contexts[:i])) >= limit:
+            prompt = (
+                prompt_start +
+                "\n\n---\n\n".join(contexts[:i-1]) +
+                prompt_end
+            )
+            break
+        elif i == len(contexts)-1:
+            prompt = (
+                prompt_start +
+                "\n\n---\n\n".join(contexts) +
+                prompt_end
+            )
+    return prompt
+
+
+def complete(prompt):
+    # instructions
+    sys_prompt = "You are a helpful assistant that always answers questions."
+    # query openai
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="gpt-3.5-turbo",
+        temperature=0
+    )
+    return chat_completion.choices[0].message.content
+
+
+# first we retrieve relevant items from Pinecone
+query_with_contexts = retrieve(query)
+print(query_with_contexts)
+# then we complete the context-infused query
+response = complete(query_with_contexts)
+print(response)
