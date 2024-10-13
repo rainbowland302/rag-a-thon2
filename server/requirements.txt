@@ -1,7 +1,12 @@
-datasets==2.19.1
+datasets==3.0.1
 Flask==3.0.3
 llama_index==0.11.17
 openai==1.51.2
 pinecone==5.3.1
 tqdm==4.66.5
 python-dotenv
+arize-phoenix
+llama-index-core>=0.10.43
+openinference-instrumentation-llama-index>=2
+opentelemetry-proto>=1.12.0
+arize-phoenix-otel

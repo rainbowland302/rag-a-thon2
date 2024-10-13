@@ -8,6 +8,16 @@ from tqdm.auto import tqdm
 from openai import OpenAI
 from dotenv import load_dotenv
 
+from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+from phoenix.otel import register
+
+
+tracer_provider = register(
+    project_name="immerse-into-real-steam-games",  # Default is 'default'
+    endpoint="http://localhost:6006/v1/traces",
+)
+
+LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
 
 # Get the directory of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -24,8 +34,6 @@ client = OpenAI(
     api_key=openai_api_key,
 )
 
-
-
 dataset = load_dataset("FronkonGames/steam-games-dataset", split="train")
 # print(dataset[0])
 
@@ -34,7 +42,6 @@ embed_model = OpenAIEmbedding(model="text-embedding-3-small", embed_batch_size=1
 
 # configure client
 pc = Pinecone(api_key=pinecone_api_key)
-
 
 spec = ServerlessSpec(
     cloud="aws", region="us-east-1"  # us-east-1
@@ -69,7 +76,8 @@ index.describe_index_stats()
 # take first 10k instances as example. Embed more at your convenience
 data = dataset.to_pandas().iloc[:1000]
 data['AppID'] = data['AppID'].astype(str)
-data = data.dropna(subset=['AppID','Release date','Supported languages','Name', 'About the game','Price','User score','Tags'])
+data = data.dropna(
+    subset=['AppID', 'Release date', 'Supported languages', 'Name', 'About the game', 'Price', 'User score', 'Tags'])
 
 batch_size = 128
 
@@ -138,6 +146,8 @@ for i in tqdm(range(0, len(data), batch_size)):
 
 # create the query vector
 limit = 100000
+
+
 def retrieve(query):
     xq = embed_model.get_text_embedding(query)
     # now query
@@ -146,12 +156,13 @@ def retrieve(query):
     # get relevant contexts
     contexts = []
     contexts = contexts + [
-        x['metadata']['Name'] + '. About the ' + x['metadata']['Name']  + ' : '+ x['metadata']['About the game'] for x in res['matches']
+        x['metadata']['Name'] + '. About the ' + x['metadata']['Name'] + ' : ' + x['metadata']['About the game'] for x
+        in res['matches']
     ]
     # build our prompt with the retrieved contexts included
     prompt_start = (
-        "Answer the question based on the context below.\n\n"+
-        "Context:\n"
+            "Answer the question based on the context below.\n\n" +
+            "Context:\n"
     )
     prompt_end = (
         f"\n\nQuestion: {query}\nAnswer:"
@@ -160,16 +171,16 @@ def retrieve(query):
     for i in range(1, len(contexts)):
         if len("\n\n---\n\n".join(contexts[:i])) >= limit:
             prompt = (
-                prompt_start +
-                "\n\n---\n\n".join(contexts[:i-1]) +
-                prompt_end
+                    prompt_start +
+                    "\n\n---\n\n".join(contexts[:i - 1]) +
+                    prompt_end
             )
             break
-        elif i == len(contexts)-1:
+        elif i == len(contexts) - 1:
             prompt = (
-                prompt_start +
-                "\n\n---\n\n".join(contexts) +
-                prompt_end
+                    prompt_start +
+                    "\n\n---\n\n".join(contexts) +
+                    prompt_end
             )
     return prompt
 
@@ -190,6 +201,7 @@ def complete(prompt):
     )
     return chat_completion.choices[0].message.content
 
+
 def get_response(query):
     # query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
     query_with_contexts = retrieve(query)
@@ -199,6 +211,7 @@ def get_response(query):
     # print(response)
     # Convert response to string for easy JSON serialization
     return str(response)
+
 
 # first we retrieve relevant items from Pinecone
 # query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
