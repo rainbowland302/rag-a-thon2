@@ -1,16 +1,12 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from flask import Flask, request, jsonify
-from core.main import get_response
+from core.pinecone_steam import get_response
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    app.logger.info('Accessing root route')
-    return 'Hello World!'
 
 @app.route('/api/search', methods=['POST'])
 def search():
@@ -22,6 +18,7 @@ def search():
         "msg": message,
         "res": response
     })
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)  # Changed port to 5001

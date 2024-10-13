@@ -10,8 +10,12 @@ import os
 from openai import OpenAI
 
 
+# Get the directory of the current file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Load the secrets from config.json
-with open('secrets.json', 'r') as file:
+secrets_path = os.path.join(current_dir, 'secrets.json')
+with open(secrets_path, 'r') as file:
     secrets = json.load(file)
 
 os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
