@@ -11,6 +11,7 @@ interface QueryResponse {
   answer: string;
   timestamp: Date;
   imageUrl?: string;
+  audioUrl?: string;
 }
 
 @Component({
@@ -29,12 +30,10 @@ export class AppComponent {
     message = "";
     responses: QueryResponse[] = [];
     isLoading = false;
-    latestBackgroundImage: string | null = null;
-    music = null;
-    latestBackgroundImage: string | null = null;
     currentBackgroundImage: string | null = null;
     nextBackgroundImage: string | null = null;
     isTransitioning = false;
+    currentAudio: HTMLAudioElement | null = null;
 
     search() {
         if (!this.message.trim()) return;
@@ -48,11 +47,9 @@ export class AppComponent {
                     question: question,
                     answer: res.res,
                     timestamp: new Date(),
-                    imageUrl: res.img
+                    imageUrl: res.img,
+                    audioUrl: res.aud
                 });
-                this.latestBackgroundImage = res.img;
-                this.music = res.aud;
-                this.latestBackgroundImage = res.img;
                 this.preloadAndUpdateBackgroundImage(res.img);
                 this.isLoading = false;
             },
@@ -82,6 +79,24 @@ export class AppComponent {
                 }, 500); // Match this with the slower fade-out duration
             };
             img.src = newImageUrl;
+        }
+    }
+
+    playAudio(response: QueryResponse) {
+        if (response.audioUrl) {
+            if (this.currentAudio) {
+                this.currentAudio.pause();
+                this.currentAudio = null;
+            }
+            this.currentAudio = new Audio(response.audioUrl);
+            this.currentAudio.play();
+        }
+    }
+
+    stopAudio() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
         }
     }
 }

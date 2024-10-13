@@ -24,7 +24,10 @@
                 </button>
             </div>
             <div class="responses-scroll-container">
-                <div *ngFor="let response of responses" class="response-container">
+                <div *ngFor="let response of responses" 
+                     class="response-container"
+                     (mouseenter)="playAudio(response)"
+                     (mouseleave)="stopAudio()">
                     <small class="timestamp">{{ response.timestamp | date:'medium' }}</small>
                     <div class="question">
                         <h3>Question:</h3>

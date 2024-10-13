@@ -109,6 +109,25 @@ img {
     border-radius: 8px;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+    }
+
+    &::after {
+        content: '🎵';
+        position: absolute;
+        bottom: 10px;  // Changed from top to bottom
+        right: 10px;
+        font-size: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
 
     .timestamp {
         position: absolute;
