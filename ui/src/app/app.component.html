@@ -7,34 +7,36 @@
             </a>
         </div>
     </header>
-    <div class="content-container">
-        <div class="search-bar">
-            <cds-icon class="search-icon" shape="search" size="24"></cds-icon>
-            <input clrInput placeholder="Ask me anything ..." [(ngModel)]="message" (keyup.enter)="search()" />
-            <button class="btn btn-link search-btn" (click)="search()" [disabled]="isLoading || !message.trim()">
-                <cds-icon class="arrow-icon" shape="circle-arrow" size="24"></cds-icon>
-            </button>
-        </div>
-        <div *ngIf="isLoading" class="spinner">
-            <span class="spinner spinner-inline">
-                Loading...
-            </span>
-            <span>
-                Loading...
-            </span>
-        </div>
-        <div *ngFor="let response of responses" class="response-container">
-            <div class="question">
-                <h3>Question:</h3>
-                <p>{{ response.question }}</p>
-                <small class="timestamp">{{ response.timestamp | date:'medium' }}</small>
+    <div class="content-container" [style.background-image]="latestBackgroundImage ? 'url(' + latestBackgroundImage + ')' : 'none'">
+        <div class="content-overlay">
+            <div class="search-bar">
+                <cds-icon class="search-icon" shape="search" size="24"></cds-icon>
+                <input clrInput placeholder="Ask me anything ..." [(ngModel)]="message" (keyup.enter)="search()" />
+                <button class="btn btn-link search-btn" (click)="search()" [disabled]="isLoading || !message.trim()">
+                    <cds-icon class="arrow-icon" shape="circle-arrow" size="24"></cds-icon>
+                </button>
             </div>
-            <div class="answer">
-                <h3>Answer:</h3>
-                <p>{{ response.answer }}</p>
+            <div *ngIf="isLoading" class="spinner">
+                <span class="spinner spinner-inline">
+                    Loading...
+                </span>
+                <span>
+                    Loading...
+                </span>
             </div>
-            <div *ngIf="response.imageUrl" class="image-container">
-                <img [src]="response.imageUrl" alt="Generated image" />
+            <div *ngFor="let response of responses" class="response-container">
+                <div class="question">
+                    <h3>Question:</h3>
+                    <p>{{ response.question }}</p>
+                    <small class="timestamp">{{ response.timestamp | date:'medium' }}</small>
+                </div>
+                <div class="answer">
+                    <h3>Answer:</h3>
+                    <p>{{ response.answer }}</p>
+                </div>
+                <div *ngIf="response.imageUrl" class="image-container">
+                    <img [src]="response.imageUrl" alt="Generated image" />
+                </div>
             </div>
         </div>
     </div>

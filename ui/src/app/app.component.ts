@@ -29,6 +29,7 @@ export class AppComponent {
     message = "";
     responses: QueryResponse[] = [];
     isLoading = false;
+    latestBackgroundImage: string | null = null;
 
     search() {
         if (!this.message.trim()) return;
@@ -43,6 +44,7 @@ export class AppComponent {
                     timestamp: new Date(),
                     imageUrl: res.img
                 });
+                this.latestBackgroundImage = res.img;
                 this.isLoading = false;
             },
             error: (err) => {
