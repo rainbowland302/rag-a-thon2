@@ -1,28 +1,27 @@
 from datasets import load_dataset
-import json
 import os
 from llama_index.embeddings.openai import OpenAIEmbedding
 from pinecone import Pinecone
 from pinecone import ServerlessSpec
 import time
 from tqdm.auto import tqdm
-import os
 from openai import OpenAI
+from dotenv import load_dotenv
 
 
 # Get the directory of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
+server_dir = os.path.dirname(current_dir)
 
-# Load the secrets from config.json
-secrets_path = os.path.join(current_dir, 'secrets.json')
-with open(secrets_path, 'r') as file:
-    secrets = json.load(file)
+# Load environment variables from .env file
+load_dotenv(os.path.join(server_dir, '.env'))
 
-os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
-os.environ["PINECONE_API_KEY"] = secrets["PINECONE_API_KEY"]
+# Now you can access the environment variables
+openai_api_key = os.getenv("OPENAI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+
 client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=openai_api_key,
 )
 
 
@@ -34,7 +33,7 @@ dataset = load_dataset("FronkonGames/steam-games-dataset", split="train")
 embed_model = OpenAIEmbedding(model="text-embedding-3-small", embed_batch_size=128)
 
 # configure client
-pc = Pinecone(api_key=secrets["PINECONE_API_KEY"])
+pc = Pinecone(api_key=pinecone_api_key)
 
 
 spec = ServerlessSpec(

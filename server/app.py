@@ -2,6 +2,10 @@ import sys
 import os
 from flask import Flask, request, jsonify
 from core.pinecone_steam import get_response
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -21,4 +25,4 @@ def search():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)  # Changed port to 5001
+    app.run(debug=True, host='0.0.0.0', port=5001)  # Changed host to '0.0.0.0' for VESSL deployment

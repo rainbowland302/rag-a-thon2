@@ -1,16 +1,16 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 import os
-import json
+from dotenv import load_dotenv
 
 # Get the directory of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
+server_dir = os.path.dirname(current_dir)
 
-# Load the secrets from config.json
-secrets_path = os.path.join(current_dir, 'secrets.json')
-with open(secrets_path, 'r') as file:
-    secrets = json.load(file)
+# Load environment variables from .env file
+load_dotenv(os.path.join(server_dir, '.env'))
 
-os.environ["OPENAI_API_KEY"] = secrets["OPENAI_API_KEY"]
+# Now you can access the environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 # Load documents and create index (do this once at startup)
 data_path = os.path.join(current_dir, 'data')

@@ -5,3 +5,4 @@ server/__pycache__
 .python-version
 server/core/__pycache__
 server/core/secrets.json
+server/.env
