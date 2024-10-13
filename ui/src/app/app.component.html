@@ -7,6 +7,13 @@
             </a>
         </div>
     </header>
+
+    @if (music) {
+        <audio controls autoplay loop>
+            <source [src]="music" type="audio/mpeg">
+        </audio>   
+    }
+
     <div class="content-container" [style.background-image]="latestBackgroundImage ? 'url(' + latestBackgroundImage + ')' : 'none'">
         <div class="content-overlay">
             <div class="search-bar">

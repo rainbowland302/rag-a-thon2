@@ -327,7 +327,7 @@ def get_response(query):
     print(query_with_prompt)
 
     async def musicgen():
-        w = MusicGenerator(timeout=10000, verbose=False)
+        w = MusicGenerator(timeout=30000, verbose=False)
         print('bugs here?: ' + query_with_prompt)
         url = await w.run(
             first_input=query_with_prompt)
@@ -338,7 +338,7 @@ def get_response(query):
 
 
     async def imagegen():
-        w = ImageGenerator(timeout=10000, verbose=False)
+        w = ImageGenerator(timeout=30000, verbose=False)
         url = await w.run(
             first_input="help me write a prompt for image generation, I want a photo of the recommended games" + str(response))
         return url

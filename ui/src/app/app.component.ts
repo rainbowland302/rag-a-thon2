@@ -30,6 +30,7 @@ export class AppComponent {
     responses: QueryResponse[] = [];
     isLoading = false;
     latestBackgroundImage: string | null = null;
+    music = null;
 
     search() {
         if (!this.message.trim()) return;
@@ -45,6 +46,7 @@ export class AppComponent {
                     imageUrl: res.img
                 });
                 this.latestBackgroundImage = res.img;
+                this.music = res.aud;
                 this.isLoading = false;
             },
             error: (err) => {
