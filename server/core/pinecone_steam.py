@@ -133,8 +133,6 @@ for i in tqdm(range(0, len(data), batch_size)):
     index.upsert(vectors=vec)
 '''
 
-query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
-
 # create the query vector
 limit = 100000
 def retrieve(query):
@@ -189,10 +187,16 @@ def complete(prompt):
     )
     return chat_completion.choices[0].message.content
 
+def get_response(query):
+    # query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
+    query_with_contexts = retrieve(query)
+    # print(query_with_contexts)
+    # then we complete the context-infused query
+    response = complete(query_with_contexts)
+    # print(response)
+    # Convert response to string for easy JSON serialization
+    return str(response)
 
 # first we retrieve relevant items from Pinecone
-query_with_contexts = retrieve(query)
-print(query_with_contexts)
-# then we complete the context-infused query
-response = complete(query_with_contexts)
-print(response)
+# query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
+# print(get_response(query))
