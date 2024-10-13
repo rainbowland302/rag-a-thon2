@@ -79,48 +79,53 @@ img {
 }
 
 .response-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
+    position: relative;
+    margin-top: 1rem;
+    padding: 1rem;
     background-color: rgba(248, 249, 250, 0.9);
     border-radius: 8px;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
+    .timestamp {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        color: #888;
+        font-size: 0.7rem;
+    }
+
     .question, .answer {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
 
         h3 {
             margin-top: 0;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             color: #333;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
         p {
             color: #555;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
         }
     }
 
     .question {
         border-bottom: 1px solid #e0e0e0;
-        padding-bottom: 1rem;
-
-        .timestamp {
-            color: #888;
-            font-size: 0.8rem;
-        }
+        padding-bottom: 0.5rem;
     }
 
     .image-container {
-        margin-top: 1rem;
+        margin-top: 0.5rem;
         display: flex;
         justify-content: center;
         
         img {
             max-width: 100%;
-            max-height: 400px;
+            max-height: 300px;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -145,4 +150,10 @@ img {
     .spinner-inline {
         margin-bottom: 10px;
     }
+}
+
+.responses-scroll-container {
+    max-height: calc(100vh - 200px);  // Adjust this value as needed
+    overflow-y: auto;
+    padding-right: 10px;  // Add some padding for the scrollbar
 }
