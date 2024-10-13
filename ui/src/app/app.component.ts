@@ -10,6 +10,7 @@ interface QueryResponse {
   question: string;
   answer: string;
   timestamp: Date;
+  imageUrl?: string;
 }
 
 @Component({
@@ -28,7 +29,6 @@ export class AppComponent {
     message = "";
     responses: QueryResponse[] = [];
     isLoading = false;
-    image: string = "";
 
     search() {
         if (!this.message.trim()) return;
@@ -40,12 +40,10 @@ export class AppComponent {
                 this.responses.unshift({
                     question: question,
                     answer: res.res,
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    imageUrl: res.img
                 });
                 this.isLoading = false;
-                if (res.img) {
-                    this.image = res.img;
-                }
             },
             error: (err) => {
                 console.error('Error:', err);
