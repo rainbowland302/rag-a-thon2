@@ -2,7 +2,7 @@
     <header class="header header-6">
         <div class="branding">
             <a href="javascript://">
-                <img  width="60" height="60" src="assets/title.png" />
+                <img width="60" height="60" src="assets/title.png" />
                 <span class="title">RAG-A-THON2</span>
             </a>
         </div>
@@ -15,14 +15,6 @@
                 <button class="btn btn-link search-btn" (click)="search()" [disabled]="isLoading || !message.trim()">
                     <cds-icon class="arrow-icon" shape="circle-arrow" size="24"></cds-icon>
                 </button>
-            </div>
-            <div *ngIf="isLoading" class="spinner">
-                <span class="spinner spinner-inline">
-                    Loading...
-                </span>
-                <span>
-                    Loading...
-                </span>
             </div>
             <div *ngFor="let response of responses" class="response-container">
                 <div class="question">
@@ -38,6 +30,14 @@
                     <img [src]="response.imageUrl" alt="Generated image" />
                 </div>
             </div>
+        </div>
+        <div *ngIf="isLoading" class="spinner">
+            <span class="spinner spinner-inline">
+                Loading...
+            </span>
+            <span>
+                Loading...
+            </span>
         </div>
     </div>
 </div>
