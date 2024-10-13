@@ -29,6 +29,7 @@ load_dotenv(os.path.join(server_dir, '.env'))
 # Now you can access the environment variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
+together_api_key = os.getenv("TOGETHER_API_KEY")
 
 client = OpenAI(
     api_key=openai_api_key,
@@ -201,6 +202,51 @@ def complete(prompt):
     )
     return chat_completion.choices[0].message.content
 
+import os
+import asyncio
+from llama_index.utils.workflow import draw_all_possible_flows
+
+from llama_index.core.workflow import (
+    StartEvent,
+    StopEvent,
+    Workflow,
+    step,
+    Event,
+)
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
+class FirstEvent(Event):
+    first_output: str
+
+
+class ImageGenerator(Workflow):
+    @step()
+    async def generate(self, ev: StartEvent) -> FirstEvent:
+        from llama_index.llms.openai import OpenAI
+        query = ev.first_input
+        print(query)
+        llm = OpenAI()
+        response = await llm.acomplete(query)
+        return FirstEvent(first_output=str(response))
+
+    @step()
+    async def generate_image(self, ev: FirstEvent) -> StopEvent:
+        query = ev.first_output
+        print(query)
+        from openai import OpenAI
+        client = OpenAI(
+            api_key=together_api_key, base_url="https://api.together.xyz/v1"
+        )
+        response = client.images.generate(
+            prompt=query,
+            model="black-forest-labs/FLUX.1.1-pro",
+            n=1,
+        )
+        print(response.data[0].url)
+        return StopEvent(result=str(response.data[0].url))
 
 def get_response(query):
     # query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
@@ -208,11 +254,19 @@ def get_response(query):
     # print(query_with_contexts)
     # then we complete the context-infused query
     response = complete(query_with_contexts)
-    # print(response)
-    # Convert response to string for easy JSON serialization
-    return str(response)
+    # return str(response)
 
+    async def imagegen():
+        w = ImageGenerator(timeout=10, verbose=False)
+        url = await w.run(
+            first_input="help me write a prompt for image generation, I want a photo of the recommended games" + str(response))
+        return url
 
-# first we retrieve relevant items from Pinecone
-# query = "i am 21 years old, and I like some adventure games on steam, can you give me some advice"
-# print(get_response(query))
+    url_flux = asyncio.run(imagegen())
+    # draw_all_possible_flows(ImageGenerator, filename="image_generator_step_workflow.html")
+    res = {
+        "res": str(response),
+        "img": str(url_flux)
+    }
+    return res
+

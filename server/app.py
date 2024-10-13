@@ -20,7 +20,8 @@ def search():
     response = get_response(message)
     return jsonify({
         "msg": message,
-        "res": response
+        "res": response.get('res'),
+        "img": response.get('img')
     })
 
 
