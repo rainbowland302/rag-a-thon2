@@ -7,14 +7,14 @@
             </a>
         </div>
     </header>
-
-    @if (music) {
-        <audio controls autoplay loop>
-            <source [src]="music" type="audio/mpeg">
-        </audio>   
-    }
-
-    <div class="content-container" [style.background-image]="latestBackgroundImage ? 'url(' + latestBackgroundImage + ')' : 'none'">
+    <div class="content-container" 
+         [ngClass]="{'transitioning': isTransitioning}"
+         [style.backgroundImage]="nextBackgroundImage ? 'url(' + nextBackgroundImage + ')' : 'none'">
+        <div class="background-overlay" 
+             [style.backgroundImage]="currentBackgroundImage ? 'url(' + currentBackgroundImage + ')' : 'none'">
+        </div>
+        <div class="background-overlay2">
+        </div>
         <div class="content-overlay">
             <div class="search-bar">
                 <cds-icon class="search-icon" shape="search" size="24"></cds-icon>
